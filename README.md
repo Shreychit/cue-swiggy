@@ -39,19 +39,51 @@ Festivals (Diwali, Rakhi, Karva Chauth) are an obvious and India-specific extens
 
 ## Architecture
 
-```
-┌─────────────────┐       ┌──────────────────┐       ┌──────────────────────┐
-│                 │       │                  │       │  Swiggy MCP Servers  │
-│  React frontend │ ◄───► │ FastAPI backend  │ ◄───► │  • Food              │
-│  (chat + plan   │       │ (agent orchestr- │       │  • Instamart         │
-│   card UI)      │       │  ator)           │       │  • Dineout           │
-└─────────────────┘       └──────────────────┘       └──────────────────────┘
-                                   │
-                                   ▼
-                          ┌──────────────────┐
-                          │  Claude API      │
-                          │  (agent brain)   │
-                          └──────────────────┘
+```mermaid
+graph TB
+    User([👤 User])
+    
+    subgraph FE["🖥️ Frontend · React + TypeScript"]
+        direction LR
+        Chat[Chat Interface]
+        PlanUI[Plan Card]
+        TrackUI[Live Tracking]
+    end
+    
+    Orch[⚙️ Agent Orchestrator<br/>FastAPI Backend]
+    
+    StateDB[(💾 Session & Plan State<br/>Redis + Postgres)]
+    
+    Claude[🧠 Claude API<br/>Agent Brain]
+    
+    subgraph MCP["🔌 Swiggy MCP Servers"]
+        direction LR
+        Food[Food]
+        Insta[Instamart]
+        Dine[Dineout]
+    end
+    
+    User <--> FE
+    FE <--> Orch
+    Orch <--> StateDB
+    Orch <--> Claude
+    Orch <--> Food
+    Orch <--> Insta
+    Orch <--> Dine
+    
+    classDef frontendStyle fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef backendStyle fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef aiStyle fill:#f3e8ff,stroke:#9333ea,color:#581c87
+    classDef mcpStyle fill:#fed7aa,stroke:#ea580c,color:#7c2d12
+    classDef userStyle fill:#d1fae5,stroke:#059669,color:#064e3b
+    classDef stateStyle fill:#e0e7ff,stroke:#4f46e5,color:#312e81
+    
+    class Chat,PlanUI,TrackUI frontendStyle
+    class Orch backendStyle
+    class Claude aiStyle
+    class Food,Insta,Dine mcpStyle
+    class User userStyle
+    class StateDB stateStyle
 ```
 
 **Frontend** — React + TypeScript. A conversational surface plus the plan card component.
@@ -101,7 +133,3 @@ Cue is designed to stay inside the Builders Club guidelines:
 ---
 
 **Contact** — happy to walk through any of this on a call. Cue is being built by a solo developer as a Swiggy Builders Club submission.
-Name: Shreyas Chitransh
-Email: shreyaschit15@gmail.com
-Linkedin: https://www.linkedin.com/in/shreyaschitransh/
-Github: https://github.com/Shreychit
